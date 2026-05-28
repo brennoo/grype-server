@@ -4,13 +4,10 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"path"
-	"strconv"
 	"syscall"
 
 	"github.com/Portshift/go-utils/healthz"
 	logutils "github.com/Portshift/go-utils/log"
-	"github.com/anchore/grype/grype/vulnerability"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/urfave/cli"
@@ -23,15 +20,12 @@ const defaultChanSize = 100
 
 func run(c *cli.Context) {
 	logutils.InitLogs(c, os.Stdout)
-	conf := config.LoadConfig()
-
-	// remove database directory if it exists to avoid using a corrupt database
-	dbDir := path.Join(conf.DbRootDir, strconv.Itoa(vulnerability.SchemaVersion))
-	if _, err := os.Stat(dbDir); !os.IsNotExist(err) {
-		if err = os.RemoveAll(dbDir); err != nil {
-			log.Fatalf("Unable to delete existing DB directory: %v", err)
-		}
+	if os.Getenv("LOG_FORMAT") == "text" {
+		log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
+	} else {
+		log.SetFormatter(&log.JSONFormatter{})
 	}
+	conf := config.LoadConfig()
 
 	errChan := make(chan struct{}, defaultChanSize)
 
@@ -74,7 +68,7 @@ func main() {
 	viper.SetDefault(config.RestServerPort, "9991")
 	viper.SetDefault(config.HealthCheckAddress, ":8080")
 	viper.SetDefault(config.DbRootDir, "./")
-	viper.SetDefault(config.DbUpdateURL, "https://toolbox-data.anchore.io/grype/databases/listing.json")
+	viper.SetDefault(config.DbUpdateURL, "https://grype.anchore.io/databases")
 	viper.AutomaticEnv()
 
 	app := cli.NewApp()
@@ -88,9 +82,10 @@ func main() {
 		Action: run,
 		Flags: []cli.Flag{
 			cli.StringFlag{
-				Name:  logutils.LogLevelFlag,
-				Value: logutils.LogLevelDefaultValue,
-				Usage: logutils.LogLevelFlagUsage,
+				Name:   logutils.LogLevelFlag,
+				Value:  logutils.LogLevelDefaultValue,
+				Usage:  logutils.LogLevelFlagUsage,
+				EnvVar: "LOG_LEVEL",
 			},
 		},
 	}

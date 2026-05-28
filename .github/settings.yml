@@ -10,7 +10,7 @@ repository:
     convenient REST API.
 
   # A URL with more information about the repository
-  homepage: openclarity.io
+  homepage: https://github.com/brennoo/grype-server
 
   # Updates the default branch for this repository.
   default_branch: main
@@ -38,19 +38,6 @@ repository:
   # Either `true` to enable automatic deletion of branches on merge, or `false` to disable
   delete_branch_on_merge: true
 
-# See https://docs.github.com/en/rest/reference/teams#add-or-update-team-repository-permissions for available options
-teams:
-  - name: grype-server
-    permission: triage
-
-  - name: grype-server-admins
-    permission: admin
-
-  - name: grype-server-maintainers
-    permission: maintain
-
-# Collaborators: give specific users access to this repository.
-# See https://docs.github.com/en/rest/reference/collaborators for available options
 collaborators: []
 
 branches:
@@ -69,8 +56,7 @@ branches:
         # Specify which users and teams can dismiss pull request reviews. Pass an empty dismissal_restrictions object to disable. User and team dismissal_restrictions are only available for organization-owned repositories. Omit this parameter for personal repositories.
         dismissal_restrictions:
           users: []
-          teams:
-            - grype-server-maintainers
+          teams: []
       # Required. Require status checks to pass before merging. Set to null to disable
       required_status_checks:
         # Required. Require branches to be up to date before merging.

@@ -7,7 +7,7 @@ SHELL=/bin/bash
 
 # Project variables
 BINARY_NAME ?= grype-server
-DOCKER_REGISTRY ?= gcr.io/eticloud/k8sec
+DOCKER_REGISTRY ?= brennoo
 VERSION ?= $(shell git rev-parse HEAD)
 DOCKER_IMAGE ?= $(DOCKER_REGISTRY)/$(BINARY_NAME)
 DOCKER_TAG ?= ${VERSION}
@@ -24,7 +24,7 @@ help: ## This help.
 .PHONY: build
 build: ## Build Grype Server
 	@(echo "Building Grype Server ..." )
-	@(cd grype-server && go mod tidy && go build -o bin/grype-server cmd/grype-server/main.go && ls -l bin/)
+	@(cd grype-server && go mod tidy && CGO_ENABLED=0 go build -o bin/grype-server cmd/grype-server/main.go && ls -l bin/)
 
 
 .PHONY: docker

@@ -28,6 +28,7 @@ jobs:
     needs: verification
     name: Build & Push
     uses: ./.github/workflows/reusable-build-and-push.yml
+    secrets: inherit
     with:
       image_tag: ${{ github.ref_name }}
       push: true
@@ -50,7 +51,7 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}

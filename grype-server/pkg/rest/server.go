@@ -30,6 +30,7 @@ func CreateRESTServer(port int, scanner scanner.Scanner) (*Server, error) {
 	}
 
 	api := operations.NewGrypeServerAPI(swaggerSpec)
+	api.Logger = log.Infof
 
 	api.PostScanSBOMHandler = operations.PostScanSBOMHandlerFunc(func(params operations.PostScanSBOMParams) middleware.Responder {
 		log.Infof("Handling Scan request.")
