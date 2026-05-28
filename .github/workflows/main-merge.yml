@@ -10,6 +10,7 @@ permissions:
 jobs:
   build_and_push:
     uses: ./.github/workflows/reusable-build-and-push.yml
+    secrets: inherit
     with:
       image_tag: latest
       push: true
