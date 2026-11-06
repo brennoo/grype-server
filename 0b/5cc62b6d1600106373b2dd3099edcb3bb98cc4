@@ -1,0 +1,26 @@
+README.md
+  h_c872c6f1ba48bc 7,28,35-56
+api/client/client.gen.go
+  h_c872c6f1ba48bc 25-27
+api/openapi.yaml
+  h_c872c6f1ba48bc 38-45
+api/server/server.gen.go
+  h_c872c6f1ba48bc 31-33,310-318
+grype-server/pkg/rest/server.go
+  h_c872c6f1ba48bc 26-33,37
+grype-server/pkg/scanner/interface/interface.go
+  h_c872c6f1ba48bc 4
+grype-server/pkg/scanner/scanner.go
+  h_c872c6f1ba48bc 8,19,30,105,107,121-143,183,190,195,210,231-241,243-268,276,281
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0b5cc62b6d1600106373b2dd3099edcb3bb98cc4",
+  "prompts": {},
+  "humans": {
+    "h_c872c6f1ba48bc": {
+      "author": "Brenno Oliveira <brenno.oliveira@deliveryhero.com>"
+    }
+  }
+}
