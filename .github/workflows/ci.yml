@@ -16,6 +16,9 @@ jobs:
         with:
           go-version-file: 'grype-server/go.mod'
 
+      - name: Install golangci-lint
+        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.12.2
+
       - name: Run verification
         run: make check
 

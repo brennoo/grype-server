@@ -49,8 +49,12 @@ api: ## Generating API code
 test: ## Run Unit Tests
 	@(cd grype-server && go test ./pkg/...)
 
+.PHONY: lint
+lint: ## Run golangci-lint
+	@(cd grype-server && golangci-lint run ./...)
+
 .PHONY: check
-check: test ## Run tests and linters
+check: test lint ## Run tests and linters
 
 .PHONY: clean
 clean: ## Clean all build artifacts
