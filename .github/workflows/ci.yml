@@ -26,6 +26,7 @@ jobs:
     needs: verification
     name: Build
     uses: ./.github/workflows/reusable-build-and-push.yml
+    secrets: inherit
     with:
       image_tag: ${{ github.sha }}
       push: false
