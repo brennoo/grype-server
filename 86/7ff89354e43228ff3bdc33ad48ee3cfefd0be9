@@ -1,0 +1,20 @@
+api/go.mod
+  h_c872c6f1ba48bc 5,13
+api/go.sum
+  h_c872c6f1ba48bc 6-7,27-28
+grype-server/go.mod
+  h_c872c6f1ba48bc 132,139,207
+grype-server/go.sum
+  h_c872c6f1ba48bc 409-410,435-436,762-763
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "867ff89354e43228ff3bdc33ad48ee3cfefd0be9",
+  "prompts": {},
+  "humans": {
+    "h_c872c6f1ba48bc": {
+      "author": "Brenno Oliveira <brenno.oliveira@deliveryhero.com>"
+    }
+  }
+}
