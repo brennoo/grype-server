@@ -1,0 +1,28 @@
+.github/CODEOWNERS
+  h_c872c6f1ba48bc 7,11
+AGENTS.md
+  h_c872c6f1ba48bc 37
+CONTRIBUTING.md
+  h_c872c6f1ba48bc 30,60,87
+api/go.mod
+  h_c872c6f1ba48bc 1
+grype-server/cmd/grype-server/main.go
+  h_c872c6f1ba48bc 15-16
+grype-server/go.mod
+  h_c872c6f1ba48bc 1,10,318
+grype-server/pkg/rest/server.go
+  h_c872c6f1ba48bc 12-13
+grype-server/pkg/scanner/scanner.go
+  h_c872c6f1ba48bc 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e03c768fb558c171e14ae6c3e1d05ad27d915abd",
+  "prompts": {},
+  "humans": {
+    "h_c872c6f1ba48bc": {
+      "author": "Brenno Oliveira <brenno.oliveira@deliveryhero.com>"
+    }
+  }
+}
