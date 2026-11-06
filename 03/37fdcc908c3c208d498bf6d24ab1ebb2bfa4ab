@@ -1,0 +1,32 @@
+.github/workflows/ci.yml
+  h_c872c6f1ba48bc 19-21
+.github/workflows/release.yaml
+  h_c872c6f1ba48bc 24-26
+.gitignore
+  h_c872c6f1ba48bc 1-20
+.golangci.yml
+  h_c872c6f1ba48bc 1-16
+Makefile
+  h_c872c6f1ba48bc 52-55,57
+grype-server/pkg/config/config_test.go
+  h_c872c6f1ba48bc 1-36
+grype-server/pkg/rest/server_test.go
+  h_c872c6f1ba48bc 1-104
+grype-server/pkg/scanner/scanner_integration_test.go
+  h_c872c6f1ba48bc 1-56
+grype-server/pkg/scanner/scanner_test.go
+  h_c872c6f1ba48bc 1-17
+grype-server/pkg/scanner/testdata/vex-not-affected.json
+  h_c872c6f1ba48bc 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0337fdcc908c3c208d498bf6d24ab1ebb2bfa4ab",
+  "prompts": {},
+  "humans": {
+    "h_c872c6f1ba48bc": {
+      "author": "Brenno Oliveira <brenno.oliveira@deliveryhero.com>"
+    }
+  }
+}
