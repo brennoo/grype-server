@@ -11,6 +11,14 @@ DOCKER_REGISTRY ?= brennoo
 VERSION ?= $(shell git rev-parse HEAD)
 DOCKER_IMAGE ?= $(DOCKER_REGISTRY)/$(BINARY_NAME)
 DOCKER_TAG ?= ${VERSION}
+PLATFORMS ?= linux/amd64,linux/arm64
+BASE_IMAGE ?= dhi.io/alpine-base:3.24
+
+DOCKER_BUILD_ARGS := \
+	--build-arg BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ") \
+	--build-arg VCS_REF=$(shell git rev-parse --short HEAD) \
+	--build-arg IMAGE_VERSION=${VERSION} \
+	--build-arg BASE_IMAGE=$(BASE_IMAGE)
 
 # HELP
 # This will output the help for each task
@@ -30,15 +38,29 @@ build: ## Build Grype Server
 .PHONY: docker
 docker: ## Build Grype Server docker image
 	@(echo "Building Grype Server docker image [${DOCKER_IMAGE}:${DOCKER_TAG}] ..." )
-	@(docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} . \
-		--build-arg BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ") \
-		--build-arg VCS_REF=$(shell git rev-parse --short HEAD) \
-		--build-arg IMAGE_VERSION=${VERSION})
+	@(docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} . $(DOCKER_BUILD_ARGS))
 
 .PHONY: docker-push
 docker-push: docker ## Build Grype Server docker image and push it to remote
 	@(echo "Pushing Grype Server docker image [${DOCKER_IMAGE}:${DOCKER_TAG}] ..." )
 	@(docker push ${DOCKER_IMAGE}:${DOCKER_TAG})
+
+.PHONY: docker-multiarch
+docker-multiarch: ## Build multi-arch (linux/amd64,linux/arm64) image, kept in the buildx cache (not pushed)
+	@(echo "Building multi-arch Grype Server image [${DOCKER_IMAGE}:${DOCKER_TAG}] ..." )
+	@(docker buildx build --platform ${PLATFORMS} \
+		-t ${DOCKER_IMAGE}:${DOCKER_TAG} \
+		$(DOCKER_BUILD_ARGS) \
+		.)
+
+.PHONY: push-multiarch
+push-multiarch: ## Push the multi-arch image built by docker-multiarch to remote (reuses the buildx cache)
+	@(echo "Pushing multi-arch Grype Server image [${DOCKER_IMAGE}:${DOCKER_TAG}] ..." )
+	@(docker buildx build --platform ${PLATFORMS} \
+		-t ${DOCKER_IMAGE}:${DOCKER_TAG} \
+		--push \
+		$(DOCKER_BUILD_ARGS) \
+		.)
 
 .PHONY: api
 api: ## Generating API code

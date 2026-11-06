@@ -1,4 +1,6 @@
-FROM --platform=$BUILDPLATFORM golang:1.26.4-alpine AS builder
+ARG BASE_IMAGE=dhi.io/alpine-base:3.24
+
+FROM --platform=$BUILDPLATFORM golang:1.26.8-alpine AS builder
 
 WORKDIR /build
 COPY api ./api
@@ -16,7 +18,7 @@ ARG TARGETARCH
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /app/grype-server ./cmd/grype-server/main.go \
     && mkdir -p /data
 
-FROM dhi.io/alpine-base:3.23
+FROM ${BASE_IMAGE}
 
 COPY --from=builder --chown=1000:1000 /app /app
 COPY --from=builder --chown=1000:1000 /data /data
