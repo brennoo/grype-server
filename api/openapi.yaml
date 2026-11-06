@@ -1,0 +1,58 @@
+openapi: "3.0.3"
+info:
+  version: "1.0.0"
+  title: "Grype Server"
+paths:
+  /api/scanSBOM:
+    post:
+      summary: Scan SBOM for vulnerabilities
+      operationId: postScanSBOM
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SBOM'
+      responses:
+        '200':
+          description: Successful scan result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vulnerabilities'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+components:
+  schemas:
+    SBOM:
+      description: Software Bill Of Materials to scan for vulnerabilities
+      type: object
+      properties:
+        sbom:
+          type: string
+          format: byte
+        vexDocuments:
+          type: array
+          description: >-
+            Optional VEX documents (OpenVEX or CSAF, auto-detected) to apply against the scan results.
+            All documents in the array must be the same format, since the format is detected from the first document.
+          items:
+            type: string
+            format: byte
+    Vulnerabilities:
+      description: Vulnerabilities of the scanned SBOM
+      type: object
+      properties:
+        vulnerabilities:
+          type: string
+          format: byte
+    ApiResponse:
+      description: An object that is returned in all cases of failures.
+      type: object
+      properties:
+        message:
+          type: string

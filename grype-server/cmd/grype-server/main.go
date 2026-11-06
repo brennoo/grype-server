@@ -12,8 +12,8 @@ import (
 	"github.com/spf13/viper"
 	"github.com/urfave/cli"
 
-	"github.com/openclarity/grype-server/grype-server/pkg/config"
-	"github.com/openclarity/grype-server/grype-server/pkg/scanner"
+	"github.com/brennoo/grype-server/grype-server/pkg/config"
+	"github.com/brennoo/grype-server/grype-server/pkg/scanner"
 )
 
 const defaultChanSize = 100

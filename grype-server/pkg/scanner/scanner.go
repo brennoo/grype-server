@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -15,6 +16,7 @@ import (
 	v6inst "github.com/anchore/grype/grype/db/v6/installation"
 	"github.com/anchore/grype/grype/distro"
 	"github.com/anchore/grype/grype/grypeerr"
+	"github.com/anchore/grype/grype/match"
 	"github.com/anchore/grype/grype/matcher"
 	"github.com/anchore/grype/grype/matcher/dotnet"
 	"github.com/anchore/grype/grype/matcher/golang"
@@ -25,11 +27,12 @@ import (
 	"github.com/anchore/grype/grype/matcher/stock"
 	grype_pkg "github.com/anchore/grype/grype/pkg"
 	"github.com/anchore/grype/grype/presenter/models"
+	"github.com/anchore/grype/grype/vex"
 	"github.com/anchore/grype/grype/vulnerability"
 	"github.com/anchore/syft/syft/format"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/openclarity/grype-server/grype-server/pkg/rest"
+	"github.com/brennoo/grype-server/grype-server/pkg/rest"
 )
 
 const (
@@ -99,9 +102,9 @@ func (s *Scanner) Stop() {
 	}
 }
 
-func (s *Scanner) Scan(sbom []byte) ([]byte, error) {
+func (s *Scanner) Scan(sbom []byte, vexDocuments [][]byte) ([]byte, error) {
 	log.Tracef("SBOM to scan: %s", sbom)
-	doc, err := s.ScanSbomJson(string(sbom))
+	doc, err := s.ScanSbomJson(string(sbom), vexDocuments)
 	if err != nil {
 		return nil, fmt.Errorf("failed to scan SBOM: %v", err)
 	}
@@ -115,7 +118,29 @@ func (s *Scanner) Scan(sbom []byte) ([]byte, error) {
 	return docB, nil
 }
 
-func (s *Scanner) ScanSbomJson(sbom string) (*models.Document, error) {
+func (s *Scanner) ScanSbomJson(sbom string, vexDocuments [][]byte) (*models.Document, error) {
+	vexPaths, cleanupVex, err := writeVexTempFiles(vexDocuments)
+	defer cleanupVex()
+	if err != nil {
+		return nil, fmt.Errorf("unable to write vex documents: %v", err)
+	}
+
+	var vexProcessor *vex.Processor
+	var ignoreRules []match.IgnoreRule
+	if len(vexPaths) > 0 {
+		ignoreRules = []match.IgnoreRule{
+			{VexStatus: "not_affected"},
+			{VexStatus: "fixed"},
+		}
+		vexProcessor, err = vex.NewProcessor(vex.ProcessorOptions{
+			Documents:   vexPaths,
+			IgnoreRules: ignoreRules,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create vex processor: %v", err)
+		}
+	}
+
 	s.RLock()
 	provider := s.vulProvider
 	s.RUnlock()
@@ -155,19 +180,19 @@ func (s *Scanner) ScanSbomJson(sbom string) (*models.Document, error) {
 		packages[i] = *p
 	}
 
-	doc, err := s.scanWithRetries(packagesContext, packages)
+	doc, err := s.scanWithRetries(packagesContext, packages, vexProcessor, ignoreRules)
 	if err != nil {
 		return nil, err
 	}
 	return doc, nil
 }
 
-func (s *Scanner) scan(packagesContext grype_pkg.Context, packages []grype_pkg.Package) (*models.Document, error) {
+func (s *Scanner) scan(packagesContext grype_pkg.Context, packages []grype_pkg.Package, vexProcessor *vex.Processor, ignoreRules []match.IgnoreRule) (*models.Document, error) {
 	s.RLock()
 	provider := s.vulProvider
 	s.RUnlock()
 
-	vulnerabilityMatcher := createVulnerabilityMatcher(provider)
+	vulnerabilityMatcher := createVulnerabilityMatcher(provider, vexProcessor, ignoreRules)
 
 	allMatches, ignoredMatches, err := vulnerabilityMatcher.FindMatches(packages, packagesContext)
 	if err != nil && !errors.Is(err, grypeerr.ErrAboveSeverityThreshold) {
@@ -182,7 +207,7 @@ func (s *Scanner) scan(packagesContext grype_pkg.Context, packages []grype_pkg.P
 	return &doc, nil
 }
 
-func createVulnerabilityMatcher(provider vulnerability.Provider) *grype.VulnerabilityMatcher {
+func createVulnerabilityMatcher(provider vulnerability.Provider, vexProcessor *vex.Processor, ignoreRules []match.IgnoreRule) *grype.VulnerabilityMatcher {
 	matchers := matcher.NewDefaultMatchers(matcher.Config{
 		Java: java.MatcherConfig{
 			ExternalSearchConfig: java.ExternalSearchConfig{
@@ -203,7 +228,44 @@ func createVulnerabilityMatcher(provider vulnerability.Provider) *grype.Vulnerab
 		VulnerabilityProvider: provider,
 		Matchers:              matchers,
 		NormalizeByCVE:        true,
+		VexProcessor:          vexProcessor,
+		IgnoreRules:           ignoreRules,
 	}
+}
+
+// writeVexTempFiles writes each VEX document to a temp file, since grype's vex.NewProcessor
+// only accepts filesystem paths (no bytes/io.Reader API). The returned cleanup func removes
+// them; it is safe to call even if an error is returned.
+func writeVexTempFiles(vexDocuments [][]byte) (paths []string, cleanup func(), err error) {
+	if len(vexDocuments) == 0 {
+		return nil, func() {}, nil
+	}
+
+	cleanup = func() {
+		for _, p := range paths {
+			if removeErr := os.Remove(p); removeErr != nil {
+				log.Warnf("Failed to remove temp vex file %q: %v", p, removeErr)
+			}
+		}
+	}
+
+	for _, doc := range vexDocuments {
+		f, createErr := os.CreateTemp("", "grype-server-vex-*")
+		if createErr != nil {
+			return paths, cleanup, fmt.Errorf("failed to create temp vex file: %v", createErr)
+		}
+		paths = append(paths, f.Name())
+
+		if _, writeErr := f.Write(doc); writeErr != nil {
+			_ = f.Close()
+			return paths, cleanup, fmt.Errorf("failed to write temp vex file: %v", writeErr)
+		}
+		if closeErr := f.Close(); closeErr != nil {
+			return paths, cleanup, fmt.Errorf("failed to close temp vex file: %v", closeErr)
+		}
+	}
+
+	return paths, cleanup, nil
 }
 
 const (
@@ -211,12 +273,12 @@ const (
 	scanRetryInterval = 5 * time.Second
 )
 
-func (s *Scanner) scanWithRetries(packagesContext grype_pkg.Context, packages []grype_pkg.Package) (*models.Document, error) {
+func (s *Scanner) scanWithRetries(packagesContext grype_pkg.Context, packages []grype_pkg.Package, vexProcessor *vex.Processor, ignoreRules []match.IgnoreRule) (*models.Document, error) {
 	var err error
 	var ret *models.Document
 
 	for attempt := 1; attempt <= numOfScanAttempts; attempt++ {
-		ret, err = s.scan(packagesContext, packages)
+		ret, err = s.scan(packagesContext, packages, vexProcessor, ignoreRules)
 		if err != nil {
 			log.Errorf("Failed to scan (attempt %v): %v", attempt, err)
 			time.Sleep(scanRetryInterval)
@@ -257,9 +319,20 @@ func (s *Scanner) loadDB() error {
 	}
 
 	s.Lock()
+	oldProvider := s.vulProvider
 	s.vulProvider = provider
 	s.providerStatus = status
 	s.Unlock()
+
+	// The old provider holds an open handle on the previous on-disk DB. grype's
+	// DB update deletes that DB file as part of activating the new one, so an
+	// open-but-unlinked handle keeps its disk space held until this is closed:
+	// otherwise every update cycle leaks another full copy of the DB on disk.
+	if oldProvider != nil {
+		if closeErr := oldProvider.Close(); closeErr != nil {
+			log.Warnf("Failed to close previous vulnerability DB provider: %v", closeErr)
+		}
+	}
 
 	log.Infof("Vulnerability DB loaded (built: %s, schema: %s)", status.Built.UTC().Format(time.RFC3339), status.SchemaVersion)
 	return nil

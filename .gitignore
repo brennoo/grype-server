@@ -1,3 +1,20 @@
-grype-server/bin/*
-*.idea
-.vscode
+# Build output
+grype-server/bin/
+
+# Grype vulnerability database (downloaded at runtime)
+*.db
+db/
+
+# Go
+*.test
+coverage.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

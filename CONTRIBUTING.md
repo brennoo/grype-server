@@ -27,7 +27,7 @@ Please see the troubleshooting and debugging guide [here](/docs/troubleshooting.
 ## Reporting Issues
 
 Before reporting a new issue, please ensure that the issue was not already reported or fixed by searching through our
-[issues list](https://github.com/openclarity/grype-server/issues).
+[issues list](https://github.com/brennoo/grype-server/issues).
 
 When creating a new issue, please be sure to include a **title and clear description**, as much relevant information as
 possible, and, if possible, a test case.
@@ -57,7 +57,7 @@ You must be logged into the docker registry locally before using this target.
 
 ### Generating API code
 
-After making changes to the API schema for example `api/swagger.yaml`, you can run `make
+After making changes to the API schema for example `api/openapi.yaml`, you can run `make
 api` to regenerate the model, client and server code.
 
 ### Unit tests
@@ -84,7 +84,7 @@ and fix existing bugs. Here is what you can do:
 
 - Help ensure that existing issues follows the recommendations from the _[Reporting Issues](#reporting-issues)_ section,
   providing feedback to the issue's author on what might be missing.
-- Review and update the existing content of our [Wiki](https://github.com/openclarity/grype-server/wiki) with up-to-date
+- Review and update the existing content of our [Wiki](https://github.com/brennoo/grype-server/wiki) with up-to-date
   instructions and code samples.
 - Review existing pull requests, and testing patches against real existing applications that use grype-server.
 - Write a test, or add a missing test case to an existing test.
