@@ -87,6 +87,6 @@ Run before every commit: `make lint`
 
 ## Docker
 
-- Multi-stage build: `golang:1.26.8-alpine` builder → `dhi.io/alpine-base:3.24` runtime
+- Multi-stage build: `golang:1.26.10-alpine` builder → `dhi.io/alpine-base:3.24` runtime
 - Binary: `/app/grype-server`; DB volume: `/data`
 - Multi-arch build/push (amd64 + arm64) via `make docker-multiarch` / `make push-multiarch`

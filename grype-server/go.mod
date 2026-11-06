@@ -1,6 +1,6 @@
 module github.com/brennoo/grype-server/grype-server
 
-go 1.26.8
+go 1.26.10
 
 require (
 	github.com/Portshift/go-utils v0.0.0-20211114210214-d8e30d7d4673

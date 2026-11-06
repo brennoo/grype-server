@@ -1,6 +1,6 @@
 ARG BASE_IMAGE=dhi.io/alpine-base:3.24
 
-FROM --platform=$BUILDPLATFORM golang:1.26.8-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.26.10-alpine AS builder
 
 WORKDIR /build
 COPY api ./api
