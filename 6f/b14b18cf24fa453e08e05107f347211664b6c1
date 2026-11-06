@@ -1,0 +1,20 @@
+AGENTS.md
+  h_c872c6f1ba48bc 90
+Dockerfile
+  h_c872c6f1ba48bc 3
+api/go.mod
+  h_c872c6f1ba48bc 3
+grype-server/go.mod
+  h_c872c6f1ba48bc 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6fb14b18cf24fa453e08e05107f347211664b6c1",
+  "prompts": {},
+  "humans": {
+    "h_c872c6f1ba48bc": {
+      "author": "Brenno Oliveira <brenno.oliveira@deliveryhero.com>"
+    }
+  }
+}
