@@ -1,0 +1,14 @@
+README.md
+  h_c872c6f1ba48bc 3-6,8,10,12,14-17,19,21,23-24,26-31,33-46,48,53,55-59,61-74,76-79,84,86,88,90-97,99-113,115,119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f4bb4e33e5218ee29c352b018c2da9b59120e0cc",
+  "prompts": {},
+  "humans": {
+    "h_c872c6f1ba48bc": {
+      "author": "Brenno Oliveira <brenno.oliveira@deliveryhero.com>"
+    }
+  }
+}
