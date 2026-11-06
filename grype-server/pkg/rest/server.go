@@ -23,12 +23,18 @@ type scanHandler struct {
 
 func (h *scanHandler) PostScanSBOM(_ context.Context, request api.PostScanSBOMRequestObject) (api.PostScanSBOMResponseObject, error) {
 	var sbom []byte
-	if request.Body != nil && request.Body.Sbom != nil {
-		sbom = *request.Body.Sbom
+	var vexDocuments [][]byte
+	if request.Body != nil {
+		if request.Body.Sbom != nil {
+			sbom = *request.Body.Sbom
+		}
+		if request.Body.VexDocuments != nil {
+			vexDocuments = *request.Body.VexDocuments
+		}
 	}
 
 	log.Infof("Handling Scan request.")
-	vulnerabilities, err := h.sc.Scan(sbom)
+	vulnerabilities, err := h.sc.Scan(sbom, vexDocuments)
 	if err != nil {
 		log.Errorf("Failed to scan SBOM: %v", err)
 		return nil, fmt.Errorf("scan failed: %v", err)

@@ -28,6 +28,9 @@ type ApiResponse struct {
 // SBOM Software Bill Of Materials to scan for vulnerabilities
 type SBOM struct {
 	Sbom *[]byte `json:"sbom,omitempty"`
+
+	// VexDocuments Optional VEX documents (OpenVEX or CSAF, auto-detected) to apply against the scan results. All documents in the array must be the same format, since the format is detected from the first document.
+	VexDocuments *[][]byte `json:"vexDocuments,omitempty"`
 }
 
 // Vulnerabilities Vulnerabilities of the scanned SBOM
@@ -304,13 +307,15 @@ func (sh *strictHandler) PostScanSBOM(w http.ResponseWriter, r *http.Request) {
 // const string: with thousands of chunks the chained `+` fold is several
 // times slower for the Go compiler than parsing a slice literal.
 var swaggerSpec = []string{
-	"rJPBbtswDIZfReB2NOJsvfnWXoYdig4LtrsiU406WdRIOkVQ+N0HKgs2OD1sQE+SaYr/R+rXCwSaKhUs",
-	"KjC8gIQDTr5tb2v6ilKpCNrniBI4VU1UYIDb4mj/hEGdHry6JI5RZy44ulScz9kFLyiOoos+5ZlRNtBB",
-	"ZarImrApTCjiH1t1PVWEAUQ5lUdYlu4SOavA0sHu7uH+GmRHUZ89o7tLObuH6O69IiefxSk5Cb64SOyO",
-	"cy7Ifp9yauprFNnTZGsknrzCAPuTInT/wvV9VfoKcZVgM9EDNjabV+trzXO8LvrfaBZKJVKbb9Js/z7x",
-	"qaLbIR+RoYMjspwhP2y2m621QxWLrwkGuNlsNzdG5vXQCHpfU2/Yl6uoJGqrkXvr9vMIA3wh0d0lqwPG",
-	"nzOK3tF4stxARbG0Y77WnEI72D+JYVwMaLv3jBEGeNf/cWj/2559K90atOqJcYRBecYWOHu2EX/cbt9M",
-	"c33PTX5lxjkEFIlzPjuPUebcTDJi9LZ9K5i/H+crIN/Kj0LPxSEzcfOGzNPk+WSQRmYDfPVhLMuy/AoA",
+	"rJRfb9QwDMC/ihV4AKncHeytbzf+iYfpECcmXnOpu2WkSbDdG9XU746crjB6k+BhT3Udx/75X+6MS11O",
+	"EaOwqe8Mu2vsbBG32X9Bziky6m+D7Mhn8Sma2mwjpMMNOgG5tgKegVB6itiAj2BDAGcZGVILrfWhJ+SV",
+	"qUymlJHEY4nQIbO9Kt5lyGhqw0I+XplxrGbNFMWMldmf7y5OQfaplVtLCOc+BNi1cGEFydvAIAnY2Qht",
+	"Ijj2ISLZgw++RF+i8CF1+m0TdVZMbQ6DoKmWXJU54s93yfXdXLC/aXZFsAEu33+DZraDF7uMUVWJ4O1+",
+	"+6EC20t61aCgE2xeKqrNOQxgr6yPrFXFCZ6Q+yC8gm0IDzz6WEwskR2g61nggNMl2yFMWVTAPrpJPWm0",
+	"T3NQaCl105knlt++tU1esOP/Kse9onA83rbLReVParYw0JGZs9dxKm1ftut46vQfqKdoqvKxTWX8vAQ9",
+	"+0hDRtgjHZGMNpt4gny92qw2mk7KGG32pjZnq83qTMmsXBeCtc1+rdjzpObEol8lt5rtp8bU5nNi2c9W",
+	"lSH80SPLeWoGtXUpCsZyTSfCu3JxfcOKMe+nSs8JW1ObZ+s/C7y+3951cV0SVO+esDG1UI9FMa10IX6z",
+	"2TxZzGWfS/jFrvbOIXPbh4ezbYpda1V8KpiHb9cjIF/j95huIyBRojIb3HedpUEhlUwL+Oi7MY7j+CsA",
 	"AP//",
 }
 

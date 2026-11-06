@@ -1,5 +1,5 @@
 package _interface
 
 type Scanner interface {
-	Scan(sbom []byte) ([]byte, error)
+	Scan(sbom []byte, vexDocuments [][]byte) ([]byte, error)
 }

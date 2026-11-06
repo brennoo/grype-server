@@ -22,6 +22,9 @@ type ApiResponse struct {
 // SBOM Software Bill Of Materials to scan for vulnerabilities
 type SBOM struct {
 	Sbom *[]byte `json:"sbom,omitempty"`
+
+	// VexDocuments Optional VEX documents (OpenVEX or CSAF, auto-detected) to apply against the scan results. All documents in the array must be the same format, since the format is detected from the first document.
+	VexDocuments *[][]byte `json:"vexDocuments,omitempty"`
 }
 
 // Vulnerabilities Vulnerabilities of the scanned SBOM

@@ -35,6 +35,14 @@ components:
         sbom:
           type: string
           format: byte
+        vexDocuments:
+          type: array
+          description: >-
+            Optional VEX documents (OpenVEX or CSAF, auto-detected) to apply against the scan results.
+            All documents in the array must be the same format, since the format is detected from the first document.
+          items:
+            type: string
+            format: byte
     Vulnerabilities:
       description: Vulnerabilities of the scanned SBOM
       type: object
