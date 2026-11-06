@@ -1,0 +1,14 @@
+grype-server/pkg/scanner/scanner.go
+  h_c872c6f1ba48bc 260,265-274
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "04811a480162c9be52c43ffa2642e4989714efba",
+  "prompts": {},
+  "humans": {
+    "h_c872c6f1ba48bc": {
+      "author": "Brenno Oliveira <brenno.oliveira@deliveryhero.com>"
+    }
+  }
+}
