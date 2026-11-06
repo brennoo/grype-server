@@ -1,0 +1,14 @@
+.github/workflows/ci.yml
+  h_c872c6f1ba48bc 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1a5e7d28783cb07de31fc19311437425202695a1",
+  "prompts": {},
+  "humans": {
+    "h_c872c6f1ba48bc": {
+      "author": "Brenno Oliveira <brenno.oliveira@deliveryhero.com>"
+    }
+  }
+}
