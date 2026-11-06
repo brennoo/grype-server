@@ -1,64 +1,60 @@
 package rest
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"net/http"
+	"time"
 
-	"github.com/openclarity/grype-server/api/server/models"
-
-	"github.com/go-openapi/loads"
-	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/openclarity/grype-server/api/server/restapi"
-	"github.com/openclarity/grype-server/api/server/restapi/operations"
+	api "github.com/openclarity/grype-server/api/server"
 	scanner "github.com/openclarity/grype-server/grype-server/pkg/scanner/interface"
 )
 
 type Server struct {
-	server *restapi.Server
-	scanner.Scanner
+	httpServer *http.Server
 }
 
-func CreateRESTServer(port int, scanner scanner.Scanner) (*Server, error) {
-	s := &Server{
-		Scanner: scanner,
+type scanHandler struct {
+	sc scanner.Scanner
+}
+
+func (h *scanHandler) PostScanSBOM(_ context.Context, request api.PostScanSBOMRequestObject) (api.PostScanSBOMResponseObject, error) {
+	var sbom []byte
+	if request.Body != nil && request.Body.Sbom != nil {
+		sbom = *request.Body.Sbom
 	}
 
-	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
+	log.Infof("Handling Scan request.")
+	vulnerabilities, err := h.sc.Scan(sbom)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load swagger spec: %v", err)
+		log.Errorf("Failed to scan SBOM: %v", err)
+		return nil, fmt.Errorf("scan failed: %v", err)
 	}
 
-	api := operations.NewGrypeServerAPI(swaggerSpec)
-	api.Logger = log.Infof
+	return api.PostScanSBOM200JSONResponse{Vulnerabilities: &vulnerabilities}, nil
+}
 
-	api.PostScanSBOMHandler = operations.PostScanSBOMHandlerFunc(func(params operations.PostScanSBOMParams) middleware.Responder {
-		log.Infof("Handling Scan request.")
-		vulnerabilities, err := s.Scan(params.Body.Sbom)
-		if err != nil {
-			log.Errorf("Failed to scan SBOM: %v", err)
-			return operations.NewPostScanSBOMDefault(500)
-		}
-		return operations.NewPostScanSBOMOK().WithPayload(&models.Vulnerabilities{
-			Vulnerabilities: vulnerabilities,
-		})
-	})
+func newAPI(sc scanner.Scanner) http.Handler {
+	return api.Handler(api.NewStrictHandler(&scanHandler{sc: sc}, nil))
+}
 
-	server := restapi.NewServer(api)
-
-	server.ConfigureFlags()
-	server.ConfigureAPI()
-	server.Port = port
-
-	s.server = server
-
-	return s, nil
+func CreateRESTServer(port int, sc scanner.Scanner) (*Server, error) {
+	return &Server{
+		httpServer: &http.Server{
+			Addr:              fmt.Sprintf(":%d", port),
+			Handler:           newAPI(sc),
+			ReadHeaderTimeout: 10 * time.Second,
+		},
+	}, nil
 }
 
 func (s *Server) Start(errChan chan struct{}) {
-	log.Infof("Starting REST server")
+	log.Infof("Starting REST server on %s", s.httpServer.Addr)
 	go func() {
-		if err := s.server.Serve(); err != nil {
+		if err := s.httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Errorf("Failed to serve REST server: %v", err)
 			errChan <- struct{}{}
 		}
@@ -67,8 +63,8 @@ func (s *Server) Start(errChan chan struct{}) {
 
 func (s *Server) Stop() {
 	log.Infof("Stopping REST server")
-	if s.server != nil {
-		if err := s.server.Shutdown(); err != nil {
+	if s.httpServer != nil {
+		if err := s.httpServer.Shutdown(context.Background()); err != nil {
 			log.Errorf("Failed to shutdown REST server: %v", err)
 		}
 	}
