@@ -257,9 +257,20 @@ func (s *Scanner) loadDB() error {
 	}
 
 	s.Lock()
+	oldProvider := s.vulProvider
 	s.vulProvider = provider
 	s.providerStatus = status
 	s.Unlock()
+
+	// The old provider holds an open handle on the previous on-disk DB. grype's
+	// DB update deletes that DB file as part of activating the new one, so an
+	// open-but-unlinked handle keeps its disk space held until this is closed:
+	// otherwise every update cycle leaks another full copy of the DB on disk.
+	if oldProvider != nil {
+		if closeErr := oldProvider.Close(); closeErr != nil {
+			log.Warnf("Failed to close previous vulnerability DB provider: %v", closeErr)
+		}
+	}
 
 	log.Infof("Vulnerability DB loaded (built: %s, schema: %s)", status.Built.UTC().Format(time.RFC3339), status.SchemaVersion)
 	return nil
