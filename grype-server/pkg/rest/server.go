@@ -9,8 +9,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	api "github.com/openclarity/grype-server/api/server"
-	scanner "github.com/openclarity/grype-server/grype-server/pkg/scanner/interface"
+	api "github.com/brennoo/grype-server/api/server"
+	scanner "github.com/brennoo/grype-server/grype-server/pkg/scanner/interface"
 )
 
 type Server struct {

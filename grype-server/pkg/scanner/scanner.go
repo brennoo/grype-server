@@ -32,7 +32,7 @@ import (
 	"github.com/anchore/syft/syft/format"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/openclarity/grype-server/grype-server/pkg/rest"
+	"github.com/brennoo/grype-server/grype-server/pkg/rest"
 )
 
 const (

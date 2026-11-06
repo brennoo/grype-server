@@ -1,4 +1,4 @@
-module github.com/openclarity/grype-server/grype-server
+module github.com/brennoo/grype-server/grype-server
 
 go 1.26.8
 
@@ -7,7 +7,7 @@ require (
 	github.com/anchore/clio v0.1.1
 	github.com/anchore/grype v0.118.0
 	github.com/anchore/syft v1.51.1
-	github.com/openclarity/grype-server/api v0.0.0
+	github.com/brennoo/grype-server/api v0.0.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/viper v1.21.0
 	github.com/urfave/cli v1.22.16
@@ -315,4 +315,4 @@ require (
 	modernc.org/sqlite v1.56.0 // indirect
 )
 
-replace github.com/openclarity/grype-server/api v0.0.0 => ./../api
+replace github.com/brennoo/grype-server/api v0.0.0 => ./../api

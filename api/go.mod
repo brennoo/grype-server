@@ -1,4 +1,4 @@
-module github.com/openclarity/grype-server/api
+module github.com/brennoo/grype-server/api
 
 go 1.25.0
 

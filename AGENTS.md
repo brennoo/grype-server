@@ -34,7 +34,7 @@ Project context and conventions for AI coding assistants.
 Two separate `go.mod` files connected by a `replace` directive in `grype-server/go.mod`:
 
 ```
-replace github.com/openclarity/grype-server/api v0.0.0 => ./../api
+replace github.com/brennoo/grype-server/api v0.0.0 => ./../api
 ```
 
 When adding or removing dependencies, run `go mod tidy` inside the relevant module directory, not from the root.
